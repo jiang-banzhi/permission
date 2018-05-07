@@ -42,6 +42,7 @@ public class AndPermisstion {
         return permissionFragment = findPermissionFragment(fragment);
     }
 
+
     public void request(PermissionCallback callback) {
         if (callback != null) {
             permissionFragment.requestPermission(callback);
