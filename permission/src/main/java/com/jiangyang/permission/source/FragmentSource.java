@@ -1,8 +1,8 @@
 package com.jiangyang.permission.source;
 
 import android.app.Fragment;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.content.Context;
+import android.content.Intent;
 
 /**
  * <pre>
@@ -13,16 +13,25 @@ import android.support.annotation.RequiresApi;
  * </pre>
  */
 
-public class FragmentSource extends Source {
+public class FragmentSource extends BaseSource {
     Fragment mFragment;
 
     public FragmentSource(Fragment mFragment) {
         this.mFragment = mFragment;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
-    public Object getFragmentManager() {
-        return mFragment.getChildFragmentManager();
+    public Context getContext() {
+        return mFragment.getContext();
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        mFragment.startActivity(intent);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        mFragment.startActivityForResult(intent, requestCode);
     }
 }

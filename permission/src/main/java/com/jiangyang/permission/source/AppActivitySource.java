@@ -1,6 +1,8 @@
 package com.jiangyang.permission.source;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 
 /**
  * <pre>
@@ -11,15 +13,26 @@ import android.app.Activity;
  * </pre>
  */
 
-public class AppActivitySource extends Source {
+public class AppActivitySource extends BaseSource {
     Activity mACtivity;
 
     public AppActivitySource(Activity mACtivity) {
         this.mACtivity = mACtivity;
     }
 
+
     @Override
-    public Object getFragmentManager() {
-        return mACtivity.getFragmentManager();
+    public Context getContext() {
+        return mACtivity;
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        mACtivity.startActivity(intent);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        mACtivity.startActivityForResult(intent, requestCode);
     }
 }

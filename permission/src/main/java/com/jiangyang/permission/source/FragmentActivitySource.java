@@ -1,5 +1,7 @@
 package com.jiangyang.permission.source;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 
 /**
@@ -11,7 +13,7 @@ import android.support.v4.app.FragmentActivity;
  * </pre>
  */
 
-public class FragmentActivitySource extends Source {
+public class FragmentActivitySource extends BaseSource {
     FragmentActivity mActivity;
 
     public FragmentActivitySource(FragmentActivity mActivity) {
@@ -19,7 +21,17 @@ public class FragmentActivitySource extends Source {
     }
 
     @Override
-    public Object getFragmentManager() {
-        return mActivity.getSupportFragmentManager();
+    public Context getContext() {
+        return mActivity;
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        mActivity.startActivity(intent);
+    }
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        mActivity.startActivityForResult(intent, requestCode);
     }
 }

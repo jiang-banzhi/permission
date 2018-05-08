@@ -16,7 +16,7 @@ import android.support.v4.app.FragmentManager;
 public class AndPermisstion {
 
     private volatile static AndPermisstion mAndPermisstion = null;
-    private String TAG = PermissionFragment.class.getSimpleName();
+    private static final String TAG = PermissionFragment.class.getSimpleName();
 
     private AndPermisstion() {
     }
