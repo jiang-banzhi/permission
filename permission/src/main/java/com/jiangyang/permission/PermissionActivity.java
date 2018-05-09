@@ -83,7 +83,9 @@ public class PermissionActivity extends Activity {
     private String[] getDeniedPermissions(String[] permissions) {
         List<String> needRequestPermissonList = new ArrayList<>();
         for (String permission : permissions) {
+            //权限未授权
             if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED
+                    //应该显示请求权限
                     || shouldShowRequestPermissionRationale(permission)) {
                 needRequestPermissonList.add(permission);
             }
@@ -111,11 +113,12 @@ public class PermissionActivity extends Activity {
         }
     }
 
+
     public interface PermissionListener {
         /**
          * 权限请求回调
          *
-         * @param permissions
+         * @param permissions 未授权权限列表
          */
         void onPermissionListerer(List<String> permissions);
     }

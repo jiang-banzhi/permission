@@ -41,7 +41,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onDenied(List<String> list) {
                         Log.e("MainActivity", "onDenied: ******>" + list);
                     }
-                }).create().request();
+                })
+                        .showTip()
+                        .create()
+                        .request();
 
             }
         });
