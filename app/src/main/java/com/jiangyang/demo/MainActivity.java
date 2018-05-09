@@ -1,13 +1,13 @@
 package com.jiangyang.demo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
 import com.jiangyang.permission.AndPermisstion;
-import com.jiangyang.permission.AndPermisstion2;
 import com.jiangyang.permission.PermissionCallback;
 
 import java.util.List;
@@ -26,12 +26,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                permission1();
-                new AndPermisstion2.Builder().with(MainActivity.this)
-                        .permissions(Manifest.permission.READ_SMS,
-                                Manifest.permission.CALL_PHONE,
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.READ_EXTERNAL_STORAGE).setCallback(new PermissionCallback() {
+
+                new AndPermisstion.Builder().with(MainActivity.this)
+                        .permissions(Manifest.permission.CAMERA).setCallback(new PermissionCallback() {
                     @Override
                     public void onGranted() {
                         Log.e("MainActivity", "onGranted");
@@ -48,24 +45,20 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        findViewById(R.id.tv2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                intent = new Intent(MainActivity.this, PermissionService.class);
+                startService(intent);
+            }
+        });
     }
 
-    private void permission1() {
-        AndPermisstion.instance()
-                .with(MainActivity.this)
-                .requestPermission(new PermissionCallback() {
-                                       @Override
-                                       public void onGranted() {
-                                           Log.i("MainActivity", "onGranted");
-                                       }
+    Intent intent;
 
-                                       @Override
-                                       public void onDenied(List<String> list) {
-                                           Log.i("MainActivity", "onDenied: " + list);
-                                       }
-                                   }, Manifest.permission.READ_SMS, Manifest.permission.CALL_PHONE, Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.READ_EXTERNAL_STORAGE);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(intent);
     }
-
-
 }
