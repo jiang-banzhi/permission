@@ -35,4 +35,6 @@
                 showTip() 默认提示
                 customTip() 自定义提示
                 settingServer() 自定义转到系统设置 需事先SettingServer接口 默认使用内置方法
+#### Thanks 
+   严振杰[AndPermission](https://github.com/yanzhenjie/AndPermission)
                    
