@@ -14,7 +14,7 @@ import android.support.v4.app.FragmentActivity;
  */
 
 public class FragmentActivitySource extends BaseSource {
-    FragmentActivity mActivity;
+    private final FragmentActivity mActivity;
 
     public FragmentActivitySource(FragmentActivity mActivity) {
         this.mActivity = mActivity;

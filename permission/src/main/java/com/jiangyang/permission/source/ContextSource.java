@@ -12,7 +12,7 @@ import android.content.Intent;
  * </pre>
  */
 public class ContextSource extends BaseSource {
-    Context mContext;
+    private final Context mContext;
 
     public ContextSource(Context context) {
         this.mContext = context;

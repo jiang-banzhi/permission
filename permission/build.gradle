@@ -1,15 +1,25 @@
-apply plugin: 'com.android.library'
+apply plugin: rootProject.ext.plugins.library
+
+
+apply plugin: rootProject.ext.bintray.dcendents
+apply plugin: rootProject.ext.bintray.bintray
+
+version = rootProject.ext.bintray.version
+
+group = rootProject.ext.bintray.group
 
 android {
-    compileSdkVersion 26
 
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+    buildToolsVersion rootProject.ext.android.buildToolsVersion
 
+    resourcePrefix "permission_"
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -22,13 +32,86 @@ android {
         }
     }
 
+
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation rootProject.ext.dependencies.appCompat
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                // Add your description here
+                name 'Android easyiIntent'    //项目描述
+                description ""
+                url rootProject.ext.bintray.siteUrl
+                // Set your license
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id rootProject.ext.bintray.developerId       //填写的一些基本信息
+                        name rootProject.ext.bintray.developerName
+                        email rootProject.ext.bintray.developerEmail
+                    }
+                }
+                scm {
+                    connection rootProject.ext.bintray.gitUrl
+                    developerConnection rootProject.ext.bintray.gitUrl
+                    url rootProject.ext.bintray.siteUrl
+                }
+            }
+        }
+    }
+}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc) {
+    options.encoding = "UTF-8"
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError false
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = BINTRAY_USER
+    key = BINTRAY_KEY
+//    user = properties.getProperty("bintray.user")
+//    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        //userOrg = "0306" //指定路径
+        repo = rootProject.ext.bintray.bintrayRepo //这个仓库必须在指定路径下，必须在网页上创建成功，否则还是无法找到 repo
+        name = rootProject.ext.bintray.bintrayName   //发布到JCenter上的项目名字
+        websiteUrl = rootProject.ext.bintray.siteUrl
+        vcsUrl = rootProject.ext.bintray.gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
 }

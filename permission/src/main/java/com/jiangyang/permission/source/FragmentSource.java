@@ -14,7 +14,7 @@ import android.content.Intent;
  */
 
 public class FragmentSource extends BaseSource {
-    Fragment mFragment;
+    private final Fragment mFragment;
 
     public FragmentSource(Fragment mFragment) {
         this.mFragment = mFragment;

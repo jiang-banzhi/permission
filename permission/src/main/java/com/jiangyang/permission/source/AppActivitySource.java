@@ -14,7 +14,7 @@ import android.content.Intent;
  */
 
 public class AppActivitySource extends BaseSource {
-    Activity mACtivity;
+    private final Activity mACtivity;
 
     public AppActivitySource(Activity mACtivity) {
         this.mACtivity = mACtivity;

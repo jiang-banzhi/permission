@@ -27,8 +27,8 @@ import java.util.List;
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class PermissionActivity extends Activity {
-    static PermissionListener sPermissionListener;
-    private static String PERMISSION_TAG = "permissions";
+    private static  PermissionListener sPermissionListener;
+    private static final String PERMISSION_TAG = "permissions";
     private static final int CODE_REQUEST_PERMISSION = 663;
 
     /**
@@ -61,7 +61,7 @@ public class PermissionActivity extends Activity {
         if (mPermissions != null && sPermissionListener != null) {
             String[] requestPermissions = getDeniedPermissions(mPermissions);
             //所有权限都已授权
-            if (requestPermissions == null || requestPermissions.length == 0) {
+            if (requestPermissions.length == 0) {
                 sPermissionListener.onPermissionListerer(new ArrayList<String>());
                 sPermissionListener = null;
                 finish();

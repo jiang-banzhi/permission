@@ -66,7 +66,7 @@ public class PermissionSetting implements SettingServer {
     private static final String LETV = "letv";
 
 
-    private BaseSource mSource;
+    private final BaseSource mSource;
 
     public PermissionSetting(@NonNull BaseSource source) {
         this.mSource = source;

@@ -31,13 +31,12 @@ import java.util.List;
 public class AndPermisstion implements PermissionActivity.PermissionListener {
 
 
-    private static final String TAG = PermissionFragment.class.getSimpleName();
-    BaseSource mSource;
-    String[] permissions;
-    PermissionCallback permissionCallback;
-    SettingServer mSetting;
-    Dialog tipDialog;
-    boolean showTip;
+    private final BaseSource mSource;
+    private final String[] permissions;
+    private final PermissionCallback permissionCallback;
+    private SettingServer mSetting;
+    private Dialog tipDialog;
+
 
     private AndPermisstion(BaseSource source, String[] permissions, PermissionCallback permissionCallback
             , Dialog dialog, boolean showTip, SettingServer settingServer) {
@@ -45,7 +44,6 @@ public class AndPermisstion implements PermissionActivity.PermissionListener {
         this.permissions = permissions;
         this.permissionCallback = permissionCallback;
         this.tipDialog = dialog;
-        this.showTip = showTip;
         this.mSetting = settingServer;
         if (tipDialog == null && showTip) {
             if (mSetting == null) {

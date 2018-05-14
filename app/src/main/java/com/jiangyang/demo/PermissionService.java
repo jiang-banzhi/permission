@@ -11,7 +11,12 @@ import com.jiangyang.permission.AndPermisstion;
 import com.jiangyang.permission.PermissionCallback;
 
 import java.util.List;
-
+/**
+ *@data 创建时间：2018/5/10 14:09
+ *@author No.1
+ *@Desciption PermissionService.java
+ *@version
+ */
 public class PermissionService extends Service {
     public PermissionService() {
     }

@@ -14,7 +14,7 @@ import android.support.v4.app.Fragment;
  */
 
 public class SupportFragmentSource extends BaseSource {
-    Fragment mFragment;
+    private final Fragment mFragment;
 
     public SupportFragmentSource(Fragment mFragment) {
         this.mFragment = mFragment;
