@@ -3,6 +3,9 @@
   使用透明activity请求权限,详细信息请查看源码。
   
 ### 使用
+
+    引入  compile 'com.jiangyang.permission:permission:1.0.0'
+
       new AndPermisstion.Builder()
                         .with(MainActivity.this)
                         .permissions(Manifest.permission.CAMERA)//需要请求的权限
