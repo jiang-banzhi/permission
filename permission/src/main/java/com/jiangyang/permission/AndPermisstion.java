@@ -31,21 +31,18 @@ import java.util.List;
 public class AndPermisstion implements PermissionActivity.PermissionListener {
 
 
-    private final BaseSource mSource;
-    private final String[] permissions;
-    private final PermissionCallback permissionCallback;
+    private BaseSource mSource;
+    private String[] permissions;
+    private PermissionCallback permissionCallback;
     private SettingServer mSetting;
     private Dialog tipDialog;
 
-
-    private AndPermisstion(BaseSource source, String[] permissions, PermissionCallback permissionCallback
-            , Dialog dialog, boolean showTip, SettingServer settingServer) {
-        this.mSource = source;
-        this.permissions = permissions;
-        this.permissionCallback = permissionCallback;
-        this.tipDialog = dialog;
-        this.mSetting = settingServer;
-        if (tipDialog == null && showTip) {
+    private AndPermisstion(Builder builder) {
+        this.mSource = builder.mSource;
+        this.permissions = builder.permissions;
+        this.tipDialog = builder.dialog;
+        this.mSetting = builder.settingServer;
+        if (tipDialog == null && builder.showTip) {
             if (mSetting == null) {
                 mSetting = new PermissionSetting(mSource);
             }
@@ -68,6 +65,20 @@ public class AndPermisstion implements PermissionActivity.PermissionListener {
                         mSetting.execute();
                     }
                 }).create();
+    }
+
+    /**
+     * 设置权限请求回调
+     *
+     * @param callback
+     */
+    public void setPermissionCallback(PermissionCallback callback) {
+        this.permissionCallback = callback;
+    }
+
+    public void requset(PermissionCallback callback) {
+        this.permissionCallback = callback;
+        request();
     }
 
     public void request() {
@@ -96,67 +107,105 @@ public class AndPermisstion implements PermissionActivity.PermissionListener {
     public static class Builder {
         BaseSource mSource;
         String[] permissions;
-        PermissionCallback permissionCallback;
+        Dialog dialog;
+        boolean showTip;
+        SettingServer settingServer;
 
-
-        public Builder with(BaseSource source) {
-            mSource = source;
-            return this;
+        public Builder(BaseSource mSource) {
+            this.mSource = mSource;
         }
 
-        public Builder with(Context context) {
-            return with(new ContextSource(context));
+        /**
+         * 上下文
+         *
+         * @param context
+         */
+        public Builder(Context context) {
+            mSource = new ContextSource(context);
         }
 
-        public Builder with(Fragment fragment) {
-            return with(new SupportFragmentSource(fragment));
+        /**
+         * android.support.v4.app fragment
+         *
+         * @param fragment
+         */
+        public Builder(Fragment fragment) {
+            mSource = new SupportFragmentSource(fragment);
         }
 
-        public Builder with(android.app.Fragment fragment) {
-            return with(new FragmentSource(fragment));
+        /**
+         * fragmenet
+         *
+         * @param fragment
+         */
+        public Builder(android.app.Fragment fragment) {
+            mSource = new FragmentSource(fragment);
         }
 
-        public Builder with(Activity activity) {
-            return with(new AppActivitySource(activity));
+        /**
+         * activity
+         *
+         * @param activity
+         */
+        public Builder(Activity activity) {
+            mSource = new AppActivitySource(activity);
         }
 
-        public Builder with(FragmentActivity activity) {
-            return with(new FragmentActivitySource(activity));
+        /**
+         * FragmentActivity
+         *
+         * @param activity
+         */
+        public Builder(FragmentActivity activity) {
+            mSource = new FragmentActivitySource(activity);
         }
 
+        /**
+         * 需要请求的权限
+         *
+         * @param permissions
+         * @return
+         */
         public Builder permissions(String... permissions) {
             this.permissions = permissions;
             return this;
         }
 
-        public Builder setCallback(PermissionCallback callback) {
-            this.permissionCallback = callback;
-            return this;
-        }
-
-        Dialog dialog;
-        boolean showTip;
-
+        /**
+         * 请求失败 是否显示提示信息
+         *
+         * @return
+         */
         public Builder showTip() {
             showTip = true;
             return this;
         }
 
+        /**
+         * 自定义请求失败提示信息
+         *
+         * @param tipDialog
+         * @return
+         */
         public Builder customTip(Dialog tipDialog) {
             showTip = true;
             dialog = tipDialog;
             return this;
         }
 
-        SettingServer settingServer;
-
+        /**
+         * 自定义跳转到设置界面
+         *
+         * @param settingServer
+         * @return
+         */
         public Builder settingServer(SettingServer settingServer) {
             this.settingServer = settingServer;
             return this;
         }
 
         public AndPermisstion create() {
-            return new AndPermisstion(mSource, permissions, permissionCallback, dialog, showTip, settingServer);
+            return new AndPermisstion(this);
         }
     }
 }

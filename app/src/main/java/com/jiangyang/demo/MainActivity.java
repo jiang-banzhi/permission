@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.jiangyang.permission.AndPermisstion;
 import com.jiangyang.permission.PermissionCallback;
@@ -27,10 +28,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                new AndPermisstion.Builder().with(MainActivity.this)
-                        .permissions(Manifest.permission.CAMERA).setCallback(new PermissionCallback() {
+                AndPermisstion andPermisstion = new AndPermisstion.Builder(MainActivity.this)
+                        .permissions(Manifest.permission.REQUEST_INSTALL_PACKAGES)
+                        .showTip()
+                        .create();
+
+                andPermisstion.requset(new PermissionCallback() {
                     @Override
                     public void onGranted() {
+                        Toast.makeText(MainActivity.this, "授权成功!", Toast.LENGTH_SHORT).show();
                         Log.e("MainActivity", "onGranted");
                     }
 
@@ -38,10 +44,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onDenied(List<String> list) {
                         Log.e("MainActivity", "onDenied: ******>" + list);
                     }
-                })
-                        .showTip()
-                        .create()
-                        .request();
+                });
+
 
             }
         });
