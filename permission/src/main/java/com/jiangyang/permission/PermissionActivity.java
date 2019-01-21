@@ -38,6 +38,7 @@ public class PermissionActivity extends Activity {
 
     boolean isRequestInstall;//是否已经请求安装权限
     boolean isRequestOverlay;//是否已经请求悬浮窗权限
+
     /**
      * 请求权限
      *
@@ -81,7 +82,6 @@ public class PermissionActivity extends Activity {
     }
 
 
-
     /**
      * 检查权限是否授予
      */
@@ -116,8 +116,14 @@ public class PermissionActivity extends Activity {
                 }
             }
         }
-        String[] permissions = requestPermissions.toArray(new String[requestPermissions.size()]);
-        requestPermissions(permissions, CODE_REQUEST_PERMISSION);
+        if (requestPermissions.isEmpty()) {
+            sPermissionListener.onPermissionListerer(requestPermissions);
+            sPermissionListener = null;
+            finish();
+        } else {
+            String[] permissions = requestPermissions.toArray(new String[requestPermissions.size()]);
+            requestPermissions(permissions, CODE_REQUEST_PERMISSION);
+        }
 
     }
 
