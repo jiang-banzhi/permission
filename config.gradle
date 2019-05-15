@@ -5,7 +5,7 @@ ext {
     ]
 
     android = [
-            applicationId    : "com.jiangyang.demo",
+            applicationId    : "com.banzhi.sample",
             compileSdkVersion: 26,
             buildToolsVersion: "26.0.2",
             minSdkVersion    : 14,
@@ -30,7 +30,7 @@ ext {
 
             version       : android.versionName,
 
-            group         : "com.jiangyang.permission" , // Maven Group ID for the artifact，一般填你唯一的包名
+            group         : "com.banzhi.permission" , // Maven Group ID for the artifact，一般填你唯一的包名
 
             siteUrl       : 'https://github.com/jiang-banzhi/permission',   // 项目的主页
             gitUrl        : 'https://github.com/jiang-banzhi/permission.git',   // Git仓库的url

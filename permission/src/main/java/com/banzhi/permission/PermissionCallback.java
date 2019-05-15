@@ -1,4 +1,4 @@
-package com.jiangyang.permission;
+package com.banzhi.permission;
 
 import java.util.List;
 

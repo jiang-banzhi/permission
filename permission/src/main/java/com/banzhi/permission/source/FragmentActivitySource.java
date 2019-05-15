@@ -1,4 +1,4 @@
-package com.jiangyang.permission.source;
+package com.banzhi.permission.source;
 
 import android.content.Context;
 import android.content.Intent;

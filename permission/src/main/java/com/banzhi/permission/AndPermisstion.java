@@ -1,4 +1,4 @@
-package com.jiangyang.permission;
+package com.banzhi.permission;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -10,12 +10,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 
-import com.jiangyang.permission.source.AppActivitySource;
-import com.jiangyang.permission.source.BaseSource;
-import com.jiangyang.permission.source.ContextSource;
-import com.jiangyang.permission.source.FragmentActivitySource;
-import com.jiangyang.permission.source.FragmentSource;
-import com.jiangyang.permission.source.SupportFragmentSource;
+import com.banzhi.permission.source.AppActivitySource;
+import com.banzhi.permission.source.BaseSource;
+import com.banzhi.permission.source.ContextSource;
+import com.banzhi.permission.source.FragmentActivitySource;
+import com.banzhi.permission.source.FragmentSource;
+import com.banzhi.permission.source.SupportFragmentSource;
 
 import java.util.List;
 

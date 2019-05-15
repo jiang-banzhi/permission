@@ -1,4 +1,4 @@
-package com.jiangyang.permission;
+package com.banzhi.permission;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 
-import com.jiangyang.permission.source.BaseSource;
+import com.banzhi.permission.source.BaseSource;
 
 
 /**

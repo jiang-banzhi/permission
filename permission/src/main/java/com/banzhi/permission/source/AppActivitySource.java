@@ -1,6 +1,6 @@
-package com.jiangyang.permission.source;
+package com.banzhi.permission.source;
 
-import android.app.Fragment;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -13,25 +13,26 @@ import android.content.Intent;
  * </pre>
  */
 
-public class FragmentSource extends BaseSource {
-    private final Fragment mFragment;
+public class AppActivitySource extends BaseSource {
+    private final Activity mACtivity;
 
-    public FragmentSource(Fragment mFragment) {
-        this.mFragment = mFragment;
+    public AppActivitySource(Activity mACtivity) {
+        this.mACtivity = mACtivity;
     }
+
 
     @Override
     public Context getContext() {
-        return mFragment.getContext();
+        return mACtivity;
     }
 
     @Override
     public void startActivity(Intent intent) {
-        mFragment.startActivity(intent);
+        mACtivity.startActivity(intent);
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        mFragment.startActivityForResult(intent, requestCode);
+        mACtivity.startActivityForResult(intent, requestCode);
     }
 }
