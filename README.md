@@ -6,7 +6,7 @@
 
       dependencies {
        
-            compile 'com.jiangyang.permission:permission:1.0.1'
+            compile 'com.banzhi.permission:permission:1.0.1'
         
       }
       AndPermisstion permission = new AndPermisstion.Builder(MainActivity.this)
