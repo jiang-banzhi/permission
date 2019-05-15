@@ -28,7 +28,7 @@ ext {
             dcendents     : 'com.github.dcendents.android-maven',
             bintray       : 'com.jfrog.bintray',
 
-            version       : "1.0.1",
+            version       : android.versionName,
 
             group         : "com.jiangyang.permission" , // Maven Group ID for the artifact，一般填你唯一的包名
 
