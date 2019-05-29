@@ -29,10 +29,10 @@
                    
 ### 方法说明
               
-                permissions() 需要请求的权限
-                showTip() 默认提示
-                customTip() 自定义提示
-                settingServer() 自定义转到系统设置 需事先SettingServer接口 默认使用内置方法
+       permissions() 需要请求的权限
+       showTip() 默认提示
+       customTip() 自定义提示
+       settingServer() 自定义转到系统设置 需事先SettingServer接口 默认使用内置方法
 
 ### 更新内容
     1.增加安装权限、悬浮窗权限申请处理
