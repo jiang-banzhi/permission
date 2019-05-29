@@ -38,24 +38,23 @@ public class PermissionService extends Service {
     }
 
     private void request() {
-        AndPermisstion andPermisstion = new AndPermisstion.Builder(this)
-                .permissions(Manifest.permission.READ_SMS,
+        AndPermisstion.getInstance()
+                .newBuilder()
+                .setPermissions(Manifest.permission.READ_SMS,
                         Manifest.permission.CALL_PHONE,
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.READ_EXTERNAL_STORAGE)
-                .create();
+                .request(new PermissionCallback() {
+                    @Override
+                    public void onGranted() {
+                        Log.e("MainActivity", "onGranted");
+                    }
 
-        andPermisstion.requset(new PermissionCallback() {
-            @Override
-            public void onGranted() {
-                Log.e("MainActivity", "onGranted");
-            }
-
-            @Override
-            public void onDenied(List<String> list) {
-                Log.e("MainActivity", "onDenied: ******>" + list);
-            }
-        });
+                    @Override
+                    public void onDenied(List<String> list) {
+                        Log.e("MainActivity", "onDenied: ******>" + list);
+                    }
+                });
 
     }
 }

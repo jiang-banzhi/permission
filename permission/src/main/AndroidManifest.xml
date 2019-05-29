@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.banzhi.permission">
+
     <application>
         <activity
             android:name="com.banzhi.permission.PermissionActivity"
@@ -7,5 +8,10 @@
             android:launchMode="standard"
             android:theme="@style/permission_style"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
+        <provider
+            android:name=".PermissionProvider"
+            android:authorities="${applicationId}.permission.provider"
+            android:exported="false"
+            android:multiprocess="true" />
     </application>
 </manifest>

@@ -1,14 +1,12 @@
 package com.banzhi.permission;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-
-import com.banzhi.permission.source.BaseSource;
 
 
 /**
@@ -65,32 +63,32 @@ public class PermissionSetting implements SettingServer {
      */
     private static final String LETV = "letv";
 
+    Activity topActivity;
 
-    private final BaseSource mSource;
 
-    public PermissionSetting(@NonNull BaseSource source) {
-        this.mSource = source;
+    public PermissionSetting() {
+            topActivity=PermissionInit.getTopActivity();
     }
 
     @Override
     public void execute() {
-        Intent intent = obtainSettingIntent(mSource.getContext());
+        Intent intent = obtainSettingIntent(topActivity);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
-            mSource.startActivity(intent);
+            topActivity.startActivity(intent);
         } catch (Exception e) {
-            mSource.startActivity(defaultIntent(mSource.getContext()));
+            topActivity.startActivity(defaultIntent(topActivity));
         }
     }
 
     @Override
     public void execute(int requestCode) {
-        Intent intent = obtainSettingIntent(mSource.getContext());
+        Intent intent = obtainSettingIntent(topActivity);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
-            mSource.startActivityForResult(intent, requestCode);
+            topActivity.startActivityForResult(intent, requestCode);
         } catch (Exception e) {
-            mSource.startActivityForResult(defaultIntent(mSource.getContext()), requestCode);
+            topActivity.startActivityForResult(defaultIntent(topActivity), requestCode);
         }
     }
 

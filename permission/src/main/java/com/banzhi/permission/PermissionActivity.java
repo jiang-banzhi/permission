@@ -54,6 +54,9 @@ public class PermissionActivity extends Activity {
         context.startActivity(intent);
     }
 
+    public static void request(Context context, List<String> permissions, PermissionListener permissionListener) {
+        request(context, permissions.toArray(new String[permissions.size()]), permissionListener);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,10 +150,7 @@ public class PermissionActivity extends Activity {
         List<String> needRequestPermissonList = new ArrayList<>();
         for (String permission : permissions) {
             //权限未授权
-            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED
-                    //应该显示请求权限
-                    || shouldShowRequestPermissionRationale(permission)) {
-
+            if (!PermissionChecker.hasPermission(this, permission)) {
                 needRequestPermissonList.add(permission);
             }
         }

@@ -1,21 +1,12 @@
 package com.banzhi.permission;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Dialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
-
-import com.banzhi.permission.source.AppActivitySource;
-import com.banzhi.permission.source.BaseSource;
-import com.banzhi.permission.source.ContextSource;
-import com.banzhi.permission.source.FragmentActivitySource;
-import com.banzhi.permission.source.FragmentSource;
-import com.banzhi.permission.source.SupportFragmentSource;
 
 import java.util.List;
 
@@ -30,25 +21,44 @@ import java.util.List;
 
 public class AndPermisstion implements PermissionActivity.PermissionListener {
 
-
-    private BaseSource mSource;
-    private String[] permissions;
     private PermissionCallback permissionCallback;
     private SettingServer mSetting;
     private Dialog tipDialog;
 
-    private AndPermisstion(Builder builder) {
-        this.mSource = builder.mSource;
-        this.permissions = builder.permissions;
-        this.tipDialog = builder.dialog;
-        this.mSetting = builder.settingServer;
-        if (tipDialog == null && builder.showTip) {
-            if (mSetting == null) {
-                mSetting = new PermissionSetting(mSource);
+    public static void init(Application context) {
+        PermissionInit.init(context);
+    }
+
+    private static class Inner {
+        private static final AndPermisstion INSTANCE = new AndPermisstion();
+    }
+
+    public static AndPermisstion getInstance() {
+        return Inner.INSTANCE;
+    }
+
+
+    public void request(Builder builder) {
+        Activity topActivity = PermissionInit.getTopActivity();
+        PermissionUtils.checkPermissions(topActivity, builder.permissions);
+        List<String> permissions = PermissionUtils.getDeniedPermissions(topActivity, builder.permissions);
+        if (permissions.isEmpty()) {
+            permissionCallback.onGranted();
+            return;
+        }
+        this.permissionCallback = builder.permissionCallback;
+        if (builder.tipDialog == null && builder.showTip) {
+            if (builder.mSetting == null) {
+                mSetting = new PermissionSetting();
             }
-            tipDialog = createDialog(mSource.getContext());
+            tipDialog = createDialog(topActivity);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PermissionActivity.request(topActivity, permissions, this);
         }
     }
+
 
     private Dialog createDialog(Context context) {
         return new AlertDialog.Builder(context).setTitle("提示信息").setMessage("当前应用缺少必要"
@@ -67,25 +77,6 @@ public class AndPermisstion implements PermissionActivity.PermissionListener {
                 }).create();
     }
 
-    /**
-     * 设置权限请求回调
-     *
-     * @param callback
-     */
-    public void setPermissionCallback(PermissionCallback callback) {
-        this.permissionCallback = callback;
-    }
-
-    public void requset(PermissionCallback callback) {
-        this.permissionCallback = callback;
-        request();
-    }
-
-    public void request() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PermissionActivity.request(mSource.getContext(), permissions, this);
-        }
-    }
 
     @Override
     public void onPermissionListerer(List<String> permissions) {
@@ -96,116 +87,77 @@ public class AndPermisstion implements PermissionActivity.PermissionListener {
             //将未授予的权限集合返回
             permissionCallback.onDenied(permissions);
             if (tipDialog != null) {
-                if (mSource.getContext() instanceof Service) {
-                    return;
-                }
                 tipDialog.show();
             }
         }
     }
 
+    public Builder newBuilder() {
+        return new Builder();
+    }
+
     public static class Builder {
-        BaseSource mSource;
-        String[] permissions;
-        Dialog dialog;
-        boolean showTip;
-        SettingServer settingServer;
-
-        public Builder(BaseSource mSource) {
-            this.mSource = mSource;
-        }
+        private String[] permissions;
+        private PermissionCallback permissionCallback;
+        private SettingServer mSetting;
+        private Dialog tipDialog;
+        boolean showTip = true;
 
         /**
-         * 上下文
-         *
-         * @param context
-         */
-        public Builder(Context context) {
-            mSource = new ContextSource(context);
-        }
-
-        /**
-         * android.support.v4.app fragment
-         *
-         * @param fragment
-         */
-        public Builder(Fragment fragment) {
-            mSource = new SupportFragmentSource(fragment);
-        }
-
-        /**
-         * fragmenet
-         *
-         * @param fragment
-         */
-        public Builder(android.app.Fragment fragment) {
-            mSource = new FragmentSource(fragment);
-        }
-
-        /**
-         * activity
-         *
-         * @param activity
-         */
-        public Builder(Activity activity) {
-            mSource = new AppActivitySource(activity);
-        }
-
-        /**
-         * FragmentActivity
-         *
-         * @param activity
-         */
-        public Builder(FragmentActivity activity) {
-            mSource = new FragmentActivitySource(activity);
-        }
-
-        /**
-         * 需要请求的权限
+         * 需要申请的权限
          *
          * @param permissions
          * @return
          */
-        public Builder permissions(String... permissions) {
+        public Builder setPermissions(String... permissions) {
             this.permissions = permissions;
             return this;
         }
 
         /**
-         * 请求失败 是否显示提示信息
+         * 自定义跳转到权限设置
          *
+         * @param mSetting
          * @return
          */
-        public Builder showTip() {
-            showTip = true;
+        public Builder setSetting(SettingServer mSetting) {
+            this.mSetting = mSetting;
             return this;
         }
 
         /**
-         * 自定义请求失败提示信息
+         * 自定义权限拒绝弹出框
          *
          * @param tipDialog
          * @return
          */
-        public Builder customTip(Dialog tipDialog) {
-            showTip = true;
-            dialog = tipDialog;
+        public Builder setTipDialog(Dialog tipDialog) {
+            this.tipDialog = tipDialog;
             return this;
         }
 
         /**
-         * 自定义跳转到设置界面
+         * 显示默认弹出框
          *
-         * @param settingServer
+         * @param showTip
          * @return
          */
-        public Builder settingServer(SettingServer settingServer) {
-            this.settingServer = settingServer;
+        public Builder setShowTip(boolean showTip) {
+            this.showTip = showTip;
             return this;
         }
 
-        public AndPermisstion create() {
-            return new AndPermisstion(this);
+        public void request() {
+            getInstance().request(null);
+        }
+
+        public void request(PermissionCallback callback) {
+            this.permissionCallback = callback;
+            if (permissions == null || permissions.length == 0) {
+                throw new NullPointerException("no permission need request");
+            }
+            getInstance().request(this);
         }
     }
+
 }

@@ -6,20 +6,20 @@ ext {
 
     android = [
             applicationId    : "com.banzhi.sample",
-            compileSdkVersion: 26,
-            buildToolsVersion: "26.0.2",
+            compileSdkVersion: 28,
+            buildToolsVersion: "28.0.0",
             minSdkVersion    : 14,
-            targetSdkVersion : 26,
+            targetSdkVersion : 28,
             versionCode      : 2,
-            versionName      : "1.0.3"
+            versionName      : "2.0.1"
     ]
 
     dependencies = [
-            fragment    : 'com.android.support:support-fragment:26.1.0',
-            appCompat   : 'com.android.support:appcompat-v7:26.1.0',
-            design      : 'com.android.support:design:26.1.0',
-            recyclerview: 'com.android.support:recyclerview-v7:26.1.0',
-            flexbox     : 'com.google.android:flexbox:0.1.2',
+            fragment    : 'com.android.support:support-fragment:28.0.0',
+            appCompat   : 'com.android.support:appcompat-v7:28.0.0',
+            design      : 'com.android.support:design:28.0.0',
+            recyclerview: 'com.android.support:recyclerview-v7:28.0.0',
+            flexbox     : 'com.google.android:flexbox:1.0.0',
             constraint  : 'com.android.support.constraint:constraint-layout:1.1.0'
 
     ]

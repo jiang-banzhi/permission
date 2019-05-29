@@ -3,6 +3,7 @@ package com.banzhi.sample;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -27,13 +28,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                AndPermisstion andPermisstion = new AndPermisstion.Builder(MainActivity.this)
-                        .permissions(Manifest.permission.REQUEST_INSTALL_PACKAGES)
-                        .showTip()
-                        .create();
-
-                andPermisstion.requset(new PermissionCallback() {
+                AndPermisstion.getInstance().newBuilder().setPermissions(Manifest.permission.CAMERA, Manifest.permission.INTERNET).request(new PermissionCallback() {
                     @Override
                     public void onGranted() {
                         Toast.makeText(MainActivity.this, "授权成功!", Toast.LENGTH_SHORT).show();
@@ -46,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
             }
         });
         findViewById(R.id.tv2).setOnClickListener(new View.OnClickListener() {
@@ -56,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
                 startService(intent);
             }
         });
+        FragmentTransaction tran = getSupportFragmentManager().beginTransaction();
+        tran.add(R.id.container, PermissionFragment.newInstance());
+        tran.commit();
     }
 
     Intent intent;
