@@ -40,7 +40,7 @@ public class PermissionService extends Service {
     private void request() {
         AndPermisstion.getInstance()
                 .newBuilder()
-                .setPermissions(Manifest.permission.READ_SMS,
+                .permissions(Manifest.permission.READ_SMS,
                         Manifest.permission.CALL_PHONE,
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.READ_EXTERNAL_STORAGE)

@@ -109,7 +109,7 @@ public class AndPermisstion implements PermissionActivity.PermissionListener {
          * @param permissions
          * @return
          */
-        public Builder setPermissions(String... permissions) {
+        public Builder permissions(String... permissions) {
             this.permissions = permissions;
             return this;
         }

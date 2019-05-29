@@ -28,18 +28,21 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AndPermisstion.getInstance().newBuilder().setPermissions(Manifest.permission.CAMERA, Manifest.permission.INTERNET).request(new PermissionCallback() {
-                    @Override
-                    public void onGranted() {
-                        Toast.makeText(MainActivity.this, "授权成功!", Toast.LENGTH_SHORT).show();
-                        Log.e("MainActivity", "onGranted");
-                    }
+                AndPermisstion.getInstance()
+                        .newBuilder()
+                        .permissions(Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
+                        .request(new PermissionCallback() {
+                            @Override
+                            public void onGranted() {
+                                Toast.makeText(MainActivity.this, "授权成功!", Toast.LENGTH_SHORT).show();
+                                Log.e("MainActivity", "onGranted");
+                            }
 
-                    @Override
-                    public void onDenied(List<String> list) {
-                        Log.e("MainActivity", "onDenied: ******>" + list);
-                    }
-                });
+                            @Override
+                            public void onDenied(List<String> list) {
+                                Log.e("MainActivity", "onDenied: ******>" + list);
+                            }
+                        });
 
             }
         });

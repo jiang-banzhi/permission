@@ -53,7 +53,7 @@ public class PermissionFragment extends Fragment {
     private void request() {
         AndPermisstion.getInstance()
                 .newBuilder()
-                .setPermissions(Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_FINE_LOCATION)
+                .permissions(Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_FINE_LOCATION)
                 .request(new PermissionCallback() {
                     @Override
                     public void onGranted() {
