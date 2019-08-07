@@ -42,11 +42,11 @@ public class AndPermisstion implements PermissionActivity.PermissionListener {
         Activity topActivity = PermissionInit.getTopActivity();
         PermissionUtils.checkPermissions(topActivity, builder.permissions);
         List<String> permissions = PermissionUtils.getDeniedPermissions(topActivity, builder.permissions);
+        this.permissionCallback = builder.permissionCallback;
         if (permissions.isEmpty()) {
             permissionCallback.onGranted();
             return;
         }
-        this.permissionCallback = builder.permissionCallback;
         if (builder.tipDialog == null && builder.showTip) {
             if (builder.mSetting == null) {
                 mSetting = new PermissionSetting();
@@ -148,7 +148,7 @@ public class AndPermisstion implements PermissionActivity.PermissionListener {
         }
 
         public void request() {
-            getInstance().request(null);
+            getInstance().request(this);
         }
 
         public void request(PermissionCallback callback) {
