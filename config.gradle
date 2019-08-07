@@ -29,8 +29,9 @@ ext {
             bintray       : 'com.jfrog.bintray',
 
             version       : android.versionName,
+            version_kt    : "1.0.0",
 
-            group         : "com.banzhi.permission" , // Maven Group ID for the artifact，一般填你唯一的包名
+            group         : "com.banzhi.permission", // Maven Group ID for the artifact，一般填你唯一的包名
 
             siteUrl       : 'https://github.com/jiang-banzhi/permission',   // 项目的主页
             gitUrl        : 'https://github.com/jiang-banzhi/permission.git',   // Git仓库的url
@@ -43,5 +44,6 @@ ext {
             //bintray- pkg
             bintrayRepo   : "maven",
             bintrayName   : 'permission',
+            bintrayName_kt: 'permission_kt',
     ]
 }
