@@ -1,9 +1,9 @@
 apply plugin: rootProject.ext.plugins.library
+apply from: 'https://gist.githubusercontent.com/jiang-banzhi/f474047a8e824a829ac36aae408add95/raw/5e8a14713600924da90520a9734ee14ba3b69aed/mvn_push.gradle'
 
 android {
 
     compileSdkVersion rootProject.ext.android.compileSdkVersion
-    buildToolsVersion rootProject.ext.android.buildToolsVersion
 
     resourcePrefix "permission_"
 
@@ -35,4 +35,3 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
-apply from: 'mevan.gradle'
