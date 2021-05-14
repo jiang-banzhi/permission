@@ -231,7 +231,7 @@ public class PermissionSetting implements SettingServer {
      */
     private static Intent sonyIntent(Context context) {
         Intent intent = new Intent();
-        intent.putExtra("packageName", BuildConfig.APPLICATION_ID);
+        intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME);
         ComponentName comp = new ComponentName("com.sonymobile.cta", "com.sonymobile.cta.SomcCTAMainActivity");
         intent.setComponent(comp);
         return intent;
@@ -245,7 +245,7 @@ public class PermissionSetting implements SettingServer {
      */
     private static Intent LGIntent(Context context) {
         Intent intent = new Intent("android.intent.action.MAIN");
-        intent.putExtra("packageName", BuildConfig.APPLICATION_ID);
+        intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME);
         ComponentName comp = new ComponentName("com.android.settings", "com.android.settings.Settings$AccessLockSummaryActivity");
         intent.setComponent(comp);
         return intent;
@@ -259,7 +259,7 @@ public class PermissionSetting implements SettingServer {
      */
     private static Intent LetIntent(Context context) {
         Intent intent = new Intent();
-        intent.putExtra("packageName", BuildConfig.APPLICATION_ID);
+        intent.putExtra("packageName", BuildConfig.LIBRARY_PACKAGE_NAME);
         ComponentName comp = new ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.PermissionAndApps");
         intent.setComponent(comp);
         return intent;

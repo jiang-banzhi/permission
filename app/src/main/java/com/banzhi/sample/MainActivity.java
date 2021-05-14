@@ -3,14 +3,15 @@ package com.banzhi.sample;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.banzhi.permission.AndPermisstion;
-import com.banzhi.permission.PermissionCallback;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.banzhi.permission_kt.AndPermisstion;
+import com.banzhi.permission_kt.PermissionCallback;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AndPermisstion.getInstance()
+                AndPermisstion.Companion.getInstance()
                         .newBuilder()
                         .permissions(Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
                         .request(new PermissionCallback() {
