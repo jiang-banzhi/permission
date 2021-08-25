@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AndPermisstion.Companion.getInstance()
                         .newBuilder()
-                        .permissions(Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
+                        .permissions(Manifest.permission.REQUEST_INSTALL_PACKAGES)
                         .request(new PermissionCallback() {
                             @Override
                             public void onGranted() {
