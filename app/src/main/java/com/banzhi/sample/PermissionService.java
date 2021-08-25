@@ -7,8 +7,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.banzhi.permission.AndPermisstion;
-import com.banzhi.permission.PermissionCallback;
+import com.banzhi.permission_kt.AndPermisstion;
+import com.banzhi.permission_kt.PermissionCallback;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class PermissionService extends Service {
     }
 
     private void request() {
-        AndPermisstion.getInstance()
+        AndPermisstion.Companion.getInstance()
                 .newBuilder()
                 .permissions(Manifest.permission.READ_SMS,
                         Manifest.permission.CALL_PHONE,

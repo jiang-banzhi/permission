@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.banzhi.permission.AndPermisstion;
-import com.banzhi.permission.PermissionCallback;
+import com.banzhi.permission_kt.AndPermisstion;
+import com.banzhi.permission_kt.PermissionCallback;
 
 import java.util.List;
 
@@ -51,7 +51,7 @@ public class PermissionFragment extends Fragment {
 
 
     private void request() {
-        AndPermisstion.getInstance()
+        AndPermisstion.Companion.getInstance()
                 .newBuilder()
                 .permissions(Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_FINE_LOCATION)
                 .request(new PermissionCallback() {

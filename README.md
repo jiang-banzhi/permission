@@ -6,7 +6,7 @@
 
       dependencies {
        
-            compile 'com.banzhi.permission:permission:2.0.1'
+            compile 'com.banzhi.permission:permission:1.1.1'
         
       }
        AndPermisstion.getInstance()
