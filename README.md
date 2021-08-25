@@ -13,7 +13,7 @@
 
       dependencies {
        
-            implementation 'com.github.jiang-banzhi:permission:2.0.3'
+            implementation 'com.github.jiang-banzhi:permission:2.0.7'
         
       }
        AndPermisstion.getInstance()
