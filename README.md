@@ -3,10 +3,17 @@
   使用透明activity请求权限,详细信息请查看源码。
   
 ### 使用
+      
+     allprojects {
+		    repositories {
+			    ...
+			    maven { url 'https://jitpack.io' }
+		    }
+	    }
 
       dependencies {
        
-            compile 'com.banzhi.permission:permission:2.0.1'
+            implementation 'com.github.jiang-banzhi:permission:2.0.3'
         
       }
        AndPermisstion.getInstance()
