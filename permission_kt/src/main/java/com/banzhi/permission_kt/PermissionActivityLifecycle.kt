@@ -47,7 +47,7 @@ class PermissionActivityLifecycle : Application.ActivityLifecycleCallbacks {
         }
     }
     fun getTopActivity(): Activity? {
-        if (!activities.isEmpty()) {
+        if (activities.isNotEmpty()) {
             val topActivity = activities[activities.size - 1]
             if (topActivity != null) {
                 return topActivity

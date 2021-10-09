@@ -33,10 +33,10 @@ class AndPermisstion : PermissionListener {
         val holder = AndPermisstion()
     }
 
-    fun request(builder: Builder?) {
-        val topActivity = PermissionInit.getTopActivity()
-        PermissionUtils.checkPermissions(topActivity, builder?.permissions!!)
-        val permissions = PermissionUtils.getDeniedPermissions(topActivity, builder?.permissions!!)
+    fun request(builder: Builder) {
+        val topActivity = PermissionInit.getTopActivity() ?: return
+        PermissionUtils.checkPermissions(topActivity, builder.permissions)
+        val permissions = PermissionUtils.getDeniedPermissions(topActivity, builder.permissions)
         this.permissionCallback = builder.permissionCallback
         if (permissions.isEmpty()) {
             permissionCallback?.onGranted()
@@ -55,10 +55,12 @@ class AndPermisstion : PermissionListener {
     }
 
     private fun createDialog(context: Context): Dialog {
-        return AlertDialog.Builder(context).setTitle("提示信息").setMessage("当前应用缺少必要" +
-                "权限，该功能暂时无法使用。如若需要，请单击【确定】按钮前往设置中心进行权限授权。")
-                .setNegativeButton("取消") { dialog, which -> mSetting?.cancle() }
-                .setPositiveButton("确定") { dialog, which -> mSetting?.execute() }.create()
+        return AlertDialog.Builder(context).setTitle("提示信息").setMessage(
+            "当前应用缺少必要" +
+                    "权限，该功能暂时无法使用。如若需要，请单击【确定】按钮前往设置中心进行权限授权。"
+        )
+            .setNegativeButton("取消") { dialog, which -> mSetting?.cancle() }
+            .setPositiveButton("确定") { dialog, which -> mSetting?.execute() }.create()
     }
 
     fun newBuilder(): Builder {
@@ -66,7 +68,7 @@ class AndPermisstion : PermissionListener {
     }
 
     override fun onPermissionListerer(permissions: List<String>) {
-        if (permissions?.size == 0) {
+        if (permissions.isEmpty()) {
             //全部都授予了权限
             permissionCallback?.onGranted()
         } else {
@@ -84,6 +86,7 @@ class AndPermisstion : PermissionListener {
         var mSetting: SettingServer? = null
         var tipDialog: Dialog? = null
         internal var showTip = true
+
         /**
          * 需要申请的权限
          *

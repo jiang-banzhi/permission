@@ -21,48 +21,58 @@ class PermissionSetting : SettingServer {
      * 制造商
      */
     private val MAKER = Build.MANUFACTURER.toLowerCase()
+
     /**
      * 华为
      */
     private val HUAWEI = "huawei"
+
     /**
      * 小米
      */
     private val XIAOMI = "xiaomi"
+
     /**
      * oppo
      */
     private val OPPO = "oppo"
+
     /**
      * vivo
      */
     private val VIVO = "vivo"
+
     /**
      * 三星
      */
     private val SAMSUNG = "samsung"
+
     /**
      * 魅族
      */
     private val MEIZU = "meizu"
+
     /**
      * 锤子
      */
     private val SMARTISAN = "smartisan"
+
     /**
      * 索尼
      */
     private val SONY = "sony"
+
     /**
      * LG
      */
     private val LG = "lg"
+
     /**
      * 乐视
      */
     private val LETV = "letv"
 
-    internal var topActivity: Activity
+    internal var topActivity: Activity? = null
 
     init {
         topActivity = PermissionInit.getTopActivity()
@@ -70,24 +80,28 @@ class PermissionSetting : SettingServer {
 
 
     override fun execute() {
-        val intent = obtainSettingIntent(topActivity)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        try {
-            topActivity.startActivity(intent)
-        } catch (e: Exception) {
-            topActivity.startActivity(defaultIntent(topActivity))
+        topActivity?.apply {
+            val intent = obtainSettingIntent(this)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                startActivity(intent)
+            } catch (e: Exception) {
+                startActivity(defaultIntent(this))
+            }
         }
-
     }
 
     override fun execute(requestCode: Int) {
-        val intent = obtainSettingIntent(topActivity)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        try {
-            topActivity.startActivityForResult(intent, requestCode)
-        } catch (e: Exception) {
-            topActivity.startActivityForResult(defaultIntent(topActivity), requestCode)
+        topActivity?.apply {
+            val intent = obtainSettingIntent(this)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                startActivityForResult(intent, requestCode)
+            } catch (e: Exception) {
+                startActivityForResult(defaultIntent(this), requestCode)
+            }
         }
+
 
     }
 
@@ -142,7 +156,10 @@ class PermissionSetting : SettingServer {
             return defaultIntent(context)
         }
         val intent = Intent()
-        intent.component = ComponentName("com.huawei.systemmanager", "com.huawei.permissionmanager.ui.MainActivity")
+        intent.component = ComponentName(
+            "com.huawei.systemmanager",
+            "com.huawei.permissionmanager.ui.MainActivity"
+        )
         return intent
     }
 
@@ -168,9 +185,15 @@ class PermissionSetting : SettingServer {
         val intent = Intent()
         intent.putExtra("packagename", context.packageName)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            intent.component = ComponentName("com.vivo.permissionmanager", "com.vivo.permissionmanager.activity.SoftPermissionDetailActivity")
+            intent.component = ComponentName(
+                "com.vivo.permissionmanager",
+                "com.vivo.permissionmanager.activity.SoftPermissionDetailActivity"
+            )
         } else {
-            intent.component = ComponentName("com.iqoo.secure", "com.iqoo.secure.safeguard.SoftPermissionDetailActivity")
+            intent.component = ComponentName(
+                "com.iqoo.secure",
+                "com.iqoo.secure.safeguard.SoftPermissionDetailActivity"
+            )
         }
         return intent
     }
@@ -244,7 +267,10 @@ class PermissionSetting : SettingServer {
     private fun LGIntent(context: Context): Intent {
         val intent = Intent("android.intent.action.MAIN")
         intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
-        val comp = ComponentName("com.android.settings", "com.android.settings.Settings\$AccessLockSummaryActivity")
+        val comp = ComponentName(
+            "com.android.settings",
+            "com.android.settings.Settings\$AccessLockSummaryActivity"
+        )
         intent.component = comp
         return intent
     }
@@ -258,7 +284,10 @@ class PermissionSetting : SettingServer {
     private fun LetIntent(context: Context): Intent {
         val intent = Intent()
         intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
-        val comp = ComponentName("com.letv.android.letvsafe", "com.letv.android.letvsafe.PermissionAndApps")
+        val comp = ComponentName(
+            "com.letv.android.letvsafe",
+            "com.letv.android.letvsafe.PermissionAndApps"
+        )
         intent.component = comp
         return intent
     }

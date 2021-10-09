@@ -65,11 +65,11 @@ class PermissionUtils {
          * @param permissions
          * @return
          */
-        fun getDeniedPermissions(context: Context, permissions: Array<String>): List<String> {
+        fun getDeniedPermissions(context: Context, permissions: Array<String>?): List<String> {
             val deniedList = ArrayList<String>()
-            for (permission in permissions) {
-                if (!PermissionChecker.hasPermission(context, permission)) {
-                    deniedList.add(permission)
+            permissions?.forEach {
+                if (!PermissionChecker.hasPermission(context, it)) {
+                    deniedList.add(it)
                 }
             }
             return deniedList
@@ -81,19 +81,20 @@ class PermissionUtils {
          * @param context
          * @param permissions
          */
-        fun checkPermissions(context: Context,  permissions: Array<String>) {
+        fun checkPermissions(context: Context, permissions: Array<String>?) {
             if (appPermissions == null) {
                 appPermissions = getManifestPermissions(context)
             }
 
-            if (permissions.size == 0) {
+            if (permissions.isNullOrEmpty()) {
                 throw IllegalArgumentException("Please enter at least one permission.")
             }
 
             for (p in permissions) {
                 if (!appPermissions!!.contains(p)) {
                     throw IllegalStateException(
-                            String.format("The permission %1\$s is not registered in manifest.xml", p))
+                        String.format("The permission %1\$s is not registered in manifest.xml", p)
+                    )
 
                 }
             }
@@ -108,7 +109,7 @@ class PermissionUtils {
         fun getManifestPermissions(context: Context): List<String> {
             try {
                 val packageInfo = context.packageManager
-                        .getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
+                    .getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
                 val permissions = packageInfo.requestedPermissions
                 if (permissions == null || permissions.size == 0) {
                     throw IllegalStateException("did not register any permissions in the manifest.xml.")

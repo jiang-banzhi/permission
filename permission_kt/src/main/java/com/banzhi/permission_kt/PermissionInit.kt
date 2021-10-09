@@ -67,8 +67,8 @@ class PermissionInit {
             throw NullPointerException("u should init first")
         }
 
-        fun getTopActivity(): Activity {
-            return lifecycle.getTopActivity()!!
+        fun getTopActivity(): Activity? {
+            return lifecycle.getTopActivity()
         }
     }
 }
