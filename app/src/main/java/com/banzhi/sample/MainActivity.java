@@ -1,17 +1,21 @@
 package com.banzhi.sample;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.banzhi.permission_kt.AndPermisstion;
 import com.banzhi.permission_kt.PermissionCallback;
+import com.banzhi.permission_kt.PermissionInit;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -28,9 +32,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getApplicationByReflect();
                 AndPermisstion.Companion.getInstance()
                         .newBuilder()
-                        .permissions(Manifest.permission.REQUEST_INSTALL_PACKAGES)
+                        .permissions(Manifest.permission.REQUEST_INSTALL_PACKAGES,Manifest.permission.CAMERA,Manifest.permission.SYSTEM_ALERT_WINDOW)
                         .request(new PermissionCallback() {
                             @Override
                             public void onGranted() {
@@ -56,6 +61,22 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction tran = getSupportFragmentManager().beginTransaction();
         tran.add(R.id.container, PermissionFragment.newInstance());
         tran.commit();
+    }
+
+    private void getApplicationByReflect() {
+        try {
+            @SuppressLint("PrivateApi")
+            Class activityThreadClass = Class.forName("com.banzhi.permission_kt.PermissionActivityLifecycle");
+            Field mActivityListField = activityThreadClass.getDeclaredField("activities");
+            mActivityListField.setAccessible(true);
+            mActivityListField.getName();
+            Field field = PermissionInit.class.getDeclaredField("lifecycle");
+            field.setAccessible(true);
+            Object o = field.get(PermissionInit.class);
+            mActivityListField.get(o);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     Intent intent;

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">permission_kt</string>
+    <string name="permission_allow">允许</string>
+    <string name="permission_reject">拒绝</string>
+    <string name="permission_access_background_location">后台访问位置信息</string>
+    <string name="permission_system_alert_window">显示在其他应用的上层</string>
+    <string name="permission_write_settings">修改系统设置</string>
+    <string name="permission_manage_external_storage">所有文件访问权限</string>
+    <string name="permission_request_install_packages">安装未知应用</string>
 </resources>

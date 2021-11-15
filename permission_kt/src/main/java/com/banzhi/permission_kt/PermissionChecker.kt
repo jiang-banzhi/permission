@@ -38,10 +38,8 @@ class PermissionChecker {
             if (opsManager == null) {
                 opsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
             }
-            result = opsManager.checkOpNoThrow(op, android.os.Process.myUid(), context.packageName)
-            return if (result != AppOpsManager.MODE_ALLOWED) {
-                false
-            } else true
+            result = opsManager.checkOpNoThrow(op!!, android.os.Process.myUid(), context.packageName)
+            return result == AppOpsManager.MODE_ALLOWED
         }
     }
 }

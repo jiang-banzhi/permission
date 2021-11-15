@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import java.lang.reflect.InvocationTargetException
 
 /**
@@ -29,7 +30,9 @@ class PermissionInit {
         }
 
         fun init(app: Application?) {
+            Log.e("init","PermissionInit")
             if (sApplication == null) {
+                sApplication
                 if (app == null) {
                     sApplication = getApplicationByReflect()
                 } else {

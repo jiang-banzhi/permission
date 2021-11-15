@@ -1,17 +1,19 @@
 package com.banzhi.permission_kt
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
 /**
@@ -22,8 +24,14 @@ import java.util.*
  * @version :
  *</pre>
  */
-class PermissionActivity : Activity() {
-
+class PermissionActivity : ComponentActivity() {
+    private val allSpecialPermissions = listOf(
+        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        Manifest.permission.SYSTEM_ALERT_WINDOW,
+        Manifest.permission.WRITE_SETTINGS,
+        Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+        Manifest.permission.REQUEST_INSTALL_PACKAGES
+    )
     val CODE_REQUEST_PERMISSION = 663
     val CODE_REQUEST_INSTALL = 213
     val CODE_REQUEST_OVERLAY = 214
@@ -44,7 +52,11 @@ class PermissionActivity : Activity() {
          * @param permissions
          * @param permissionListener
          */
-        fun request(context: Context, permissions: Array<String>, permissionListener: PermissionListener) {
+        fun request(
+            context: Context,
+            permissions: Array<String>,
+            permissionListener: PermissionListener
+        ) {
             sPermissionListener = permissionListener
             val intent = Intent(context, PermissionActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -52,7 +64,11 @@ class PermissionActivity : Activity() {
             context.startActivity(intent)
         }
 
-        fun request(context: Context, permissions: List<String>, permissionListener: PermissionListener) {
+        fun request(
+            context: Context,
+            permissions: List<String>,
+            permissionListener: PermissionListener
+        ) {
             request(context, permissions.toTypedArray(), permissionListener)
         }
     }
@@ -60,10 +76,10 @@ class PermissionActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         invasionStatusBar()
-        requestPermission()
+        requestPermissionNow()
     }
 
-    fun invasionStatusBar() {
+    private fun invasionStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val window = window
             val decorView = window.decorView
@@ -75,150 +91,255 @@ class PermissionActivity : Activity() {
         }
     }
 
-    internal var requestPermissions: MutableList<String> = ArrayList()
-    fun requestPermission() {
-        val intent = intent
-        val mPermissions = intent.getStringArrayExtra(PERMISSION_TAG)
-        if (mPermissions != null && sPermissionListener != null) {
-            requestPermissions = getDeniedPermissions(mPermissions)
-            //所有权限都已授权
-            if (requestPermissions.size == 0) {
-                hasAllPermissions()
+    private val normalList = mutableListOf<String>()
+    private val specialList = mutableListOf<String>()
+
+    //未授权集合
+    private val deniedList = ArrayList<String>()
+    private fun requestPermissionNow() {
+        val requestList = intent.getStringArrayExtra(PERMISSION_TAG)
+        requestList?.forEach {
+            if (it in allSpecialPermissions) {
+                specialList.add(it)
             } else {
-                requestPermissions()
+                normalList.add(it)
             }
-        } else {
-            sPermissionListener = null
-            finish()
         }
+        val osVersion = Build.VERSION.SDK_INT
+        val targetSdkVersion = applicationInfo.targetSdkVersion
+
+        if (osVersion == Build.VERSION_CODES.Q ||
+            (osVersion == Build.VERSION_CODES.R && targetSdkVersion < Build.VERSION_CODES.R)
+        ) {
+            specialList.remove(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            normalList.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+        requestNormalPermissions()
     }
 
-    /**
-     * 已经获取所需权限
-     */
-    private fun hasAllPermissions() {
-        sPermissionListener?.onPermissionListerer(ArrayList<String>())
+    private fun requestPermissions() {
+        if (specialList.isNotEmpty()) {
+            val permission = specialList.firstOrNull()
+            val message = packageManager.getApplicationLabel(applicationInfo).toString()
+            DefaultDialog(this, permission, message) {
+                when (it) {
+                    0 -> {
+                        requestSpecialPermissions(permission)
+                    }
+                    1 -> {
+                        specialList.remove(permission)
+                        requestSpecialPermissions(permission)
+                    }
+                }
+            }.show()
+
+            return
+        }
+        sPermissionListener?.onPermissionListerer(deniedList)
         sPermissionListener = null
         finish()
     }
 
-    /**
-     * 获取权限集中需要申请权限的列表
-     *
-     * @param permissions
-     * @return
-     */
-    private fun getDeniedPermissions(permissions: Array<String>): ArrayList<String> {
-        val needRequestPermissonList = ArrayList<String>()
-        for (permission in permissions) {
-            //权限未授权
-            if (!PermissionChecker.hasPermission(this, permission)) {
-                needRequestPermissonList.add(permission)
+    private fun requestSpecialPermissions(permission: String?) {
+        when (permission) {
+            Manifest.permission.SYSTEM_ALERT_WINDOW -> {
+                requestSystemAlertPermission()
+            }
+            Manifest.permission.REQUEST_INSTALL_PACKAGES -> {
+                requestInstallPermission()
+            }
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                requestInstallPermission()
+            }
+            Manifest.permission.WRITE_SETTINGS -> {
+                requestWriteSettingPermission()
+            }
+            Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
+                requestManageExternalStoragePermission()
             }
         }
-        return needRequestPermissonList
     }
 
-    /**
-     * 检查权限是否授予
-     */
-    private fun requestPermissions() {
-        //跳转到允许安装未知来源设置页面
-        if (requestPermissions.contains(Manifest.permission.REQUEST_INSTALL_PACKAGES)) {
-            if (PermissionUtils.hasInstallPermission(this)) {
-                requestPermissions.remove(Manifest.permission.REQUEST_INSTALL_PACKAGES)
-                if (requestPermissions.size == 0) {
-                    hasAllPermissions()
-                    return
-                }
-            } else {
-                if (!isRequestInstall) {
-                    installSetting()
-                    return
-                }
+    ///////////////////////////////////////////////////////////////////////////
+    // 通用权限
+    ///////////////////////////////////////////////////////////////////////////
+    private val normalPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grantResults ->
+            onRequestNormalPermissionsResult(grantResults)
+        }
+
+    private fun onRequestNormalPermissionsResult(grantResults: Map<String, Boolean>) {
+        for ((permission, granted) in grantResults) {
+            if (!granted) {
+                deniedList.add(permission)
             }
         }
-        //跳转到悬浮窗设置页面
-        if (requestPermissions.contains(Manifest.permission.SYSTEM_ALERT_WINDOW)) {
-            if (PermissionUtils.hasOverlaysPermission(this)) {
-                requestPermissions.remove(Manifest.permission.SYSTEM_ALERT_WINDOW)
-                if (requestPermissions.size == 0) {
-                    hasAllPermissions()
-                    return
-                }
-            } else {
-                if (!isRequestOverlay) {
-                    overlaySetting()
-                    return
-                }
-            }
+        requestPermissions()
+    }
+
+    private fun requestNormalPermissions() {
+        normalPermissionLauncher.launch(normalList.toTypedArray())
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // 安装未知来源 android.permission.REQUEST_INSTALL_PACKAGES
+    ///////////////////////////////////////////////////////////////////////////
+    private val installPackagesLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            onRequestInstallPackagesPermissionResult()
         }
-        if (requestPermissions.isEmpty()) {
-            sPermissionListener?.onPermissionListerer(requestPermissions)
-            sPermissionListener = null
-            finish()
+
+    private fun requestInstallPermission() {
+        if (specialList.contains(Manifest.permission.REQUEST_INSTALL_PACKAGES)
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+            && applicationInfo.targetSdkVersion >= Build.VERSION_CODES.O
+        ) {
+            if (packageManager.canRequestPackageInstalls()) {
+                onRequestInstallPackagesPermissionResult()
+                return
+            }
+            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
+            intent.data = Uri.parse("package:${packageName}")
+            installPackagesLauncher.launch(intent)
         } else {
-            val permissions = requestPermissions.toTypedArray()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(permissions, CODE_REQUEST_PERMISSION)
-            }
+            onRequestInstallPackagesPermissionResult()
         }
 
+
     }
 
-    /**
-     * 跳转到允许安装未知来源设置页面
-     */
-    private fun installSetting() {
-        val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName"))
-        startActivityForResult(intent, CODE_REQUEST_INSTALL)
-    }
-
-    /**
-     * 跳转到悬浮窗设置页面
-     */
-    private fun overlaySetting() {
-        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-        startActivityForResult(intent, CODE_REQUEST_OVERLAY)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CODE_REQUEST_PERMISSION) {
-            //未授权集合
-            val deniedList = ArrayList<String>()
-            for (i in permissions.indices) {
-                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                    deniedList.add(permissions[i])
-                }
+    private fun onRequestInstallPackagesPermissionResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!packageManager.canRequestPackageInstalls()) {
+                deniedList.add(Manifest.permission.REQUEST_INSTALL_PACKAGES)
             }
-            if (sPermissionListener != null) {
-                sPermissionListener?.onPermissionListerer(deniedList)
-                sPermissionListener = null
-                finish()
+        }
+        specialList.remove(Manifest.permission.REQUEST_INSTALL_PACKAGES)
+        requestPermissions()
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // 悬浮窗 android.permission.SYSTEM_ALERT_WINDOW
+    ///////////////////////////////////////////////////////////////////////////
+    private val requestSystemAlertWindowLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            onRequestSystemAlertWindowPermissionResult()
+        }
+
+    private fun requestSystemAlertPermission() {
+        if (specialList.contains(Manifest.permission.SYSTEM_ALERT_WINDOW)
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            && applicationInfo.targetSdkVersion >= Build.VERSION_CODES.O
+        ) {
+            if (Settings.canDrawOverlays(this)) {
+                onRequestSystemAlertWindowPermissionResult()
+                return
             }
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            intent.data = Uri.parse("package:${packageName}")
+            requestSystemAlertWindowLauncher.launch(intent)
+        } else {
+            onRequestSystemAlertWindowPermissionResult()
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            CODE_REQUEST_INSTALL -> {
-                isRequestInstall = true
-                if (resultCode == RESULT_OK) {
-                    requestPermissions.remove(Manifest.permission.REQUEST_INSTALL_PACKAGES)
-
-                }
-            }
-            CODE_REQUEST_OVERLAY -> {
-                isRequestOverlay = true
-                if (resultCode == RESULT_OK) {
-                    requestPermissions.remove(Manifest.permission.SYSTEM_ALERT_WINDOW)
-                }
-            }
-            else -> {
+    private fun onRequestSystemAlertWindowPermissionResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                deniedList.add(Manifest.permission.SYSTEM_ALERT_WINDOW)
             }
         }
+        specialList.remove(Manifest.permission.SYSTEM_ALERT_WINDOW)
+        requestPermissions()
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // 写入设置 android.permission.WRITE_SETTINGS
+    ///////////////////////////////////////////////////////////////////////////
+
+    private val writeSettingsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            onRequestWriteSettingsPermissionResult()
+        }
+
+    private fun requestWriteSettingPermission() {
+        if (specialList.contains(Manifest.permission.WRITE_SETTINGS)
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            && !Settings.System.canWrite(this)
+        ) {
+            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+            intent.data = Uri.parse("package:${packageName}")
+            writeSettingsLauncher.launch(intent)
+        } else {
+            onRequestWriteSettingsPermissionResult()
+        }
+    }
+
+    private fun onRequestWriteSettingsPermissionResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+        ) {
+            if (!Settings.System.canWrite(this)) {
+                deniedList.add(Manifest.permission.WRITE_SETTINGS)
+            }
+        }
+        specialList.remove(Manifest.permission.WRITE_SETTINGS)
+        requestPermissions()
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // 文件管理 android.permission.MANAGE_EXTERNAL_STORAGE
+    ///////////////////////////////////////////////////////////////////////////
+    private val manageExternalStorageLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            onRequestManageExternalStoragePermissionResult()
+        }
+
+    private fun requestManageExternalStoragePermission() {
+
+        if (specialList.contains(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+            && !Environment.isExternalStorageManager()
+        ) {
+            val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+            manageExternalStorageLauncher.launch(intent)
+        } else {
+            onRequestManageExternalStoragePermissionResult()
+        }
+    }
+
+    private fun onRequestManageExternalStoragePermissionResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                deniedList.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+            }
+        }
+        specialList.remove(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+        requestPermissions()
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // 后台定位 android.permission.ACCESS_BACKGROUND_LOCATION
+    ///////////////////////////////////////////////////////////////////////////
+    private val backgroundLocationLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            onRequestBackgroundLocationPermissionResult(granted)
+        }
+
+    private fun requestBackgroundLocationLauncher() {
+        if (specialList.contains(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        ) {
+            backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+    }
+
+    private fun onRequestBackgroundLocationPermissionResult(granted: Boolean?) {
+        if (granted == false) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                deniedList.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
+        }
+        specialList.remove(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         requestPermissions()
     }
 

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/permission_default_dialog_bg"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/messageText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="28dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginRight="28dp"
+        android:gravity="center"
+        android:textColor="@color/permission_text_color"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/messagePermission"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="28dp"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="28dp"
+        android:layout_marginBottom="20dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/positiveLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/permission_split_line" />
+
+        <Button
+            android:id="@+id/positiveBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textAllCaps="false"
+            android:textColor="@color/permission_tint_color"
+            android:textSize="14sp"
+            android:text="@string/permission_allow" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/negativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/permission_split_line" />
+
+        <Button
+            android:id="@+id/negativeBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textAllCaps="false"
+            android:textColor="@color/permission_tint_color"
+            android:textSize="14sp"
+            android:text="@string/permission_reject" />
+
+    </LinearLayout>
+
+</LinearLayout>

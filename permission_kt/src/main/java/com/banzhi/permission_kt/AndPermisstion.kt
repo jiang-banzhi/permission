@@ -4,7 +4,7 @@ import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import android.os.Build
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 
 /**
  *<pre>
@@ -59,8 +59,8 @@ class AndPermisstion : PermissionListener {
             "当前应用缺少必要" +
                     "权限，该功能暂时无法使用。如若需要，请单击【确定】按钮前往设置中心进行权限授权。"
         )
-            .setNegativeButton("取消") { dialog, which -> mSetting?.cancle() }
-            .setPositiveButton("确定") { dialog, which -> mSetting?.execute() }.create()
+            .setNegativeButton("取消") { _, _ -> mSetting?.cancle() }
+            .setPositiveButton("确定") { _, _ -> mSetting?.execute() }.create()
     }
 
     fun newBuilder(): Builder {
@@ -138,7 +138,7 @@ class AndPermisstion : PermissionListener {
 
         fun request(callback: PermissionCallback) {
             this.permissionCallback = callback
-            if (permissions == null || permissions!!.size == 0) {
+            if (permissions.isNullOrEmpty()) {
                 throw NullPointerException("no permission need request")
             }
             instance.request(this)

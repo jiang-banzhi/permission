@@ -252,7 +252,7 @@ class PermissionSetting : SettingServer {
      */
     private fun sonyIntent(context: Context): Intent {
         val intent = Intent()
-        intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+        intent.putExtra("packageName", context.packageName)
         val comp = ComponentName("com.sonymobile.cta", "com.sonymobile.cta.SomcCTAMainActivity")
         intent.component = comp
         return intent
@@ -266,7 +266,7 @@ class PermissionSetting : SettingServer {
      */
     private fun LGIntent(context: Context): Intent {
         val intent = Intent("android.intent.action.MAIN")
-        intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+        intent.putExtra("packageName", context.packageName)
         val comp = ComponentName(
             "com.android.settings",
             "com.android.settings.Settings\$AccessLockSummaryActivity"
@@ -283,7 +283,10 @@ class PermissionSetting : SettingServer {
      */
     private fun LetIntent(context: Context): Intent {
         val intent = Intent()
-        intent.putExtra("packageName", BuildConfig.APPLICATION_ID)
+        intent.putExtra(
+            "packageName",
+            context.packageName
+        )
         val comp = ComponentName(
             "com.letv.android.letvsafe",
             "com.letv.android.letvsafe.PermissionAndApps"

@@ -1,1 +1,1 @@
-include ':app', ':permission', ':permission_kt'
+include ':app', ':permission_kt'

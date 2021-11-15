@@ -6,44 +6,12 @@ ext {
 
     android = [
             applicationId    : "com.banzhi.sample",
-            compileSdkVersion: 28,
-            buildToolsVersion: "28.0.0",
-            minSdkVersion    : 14,
+            compileSdkVersion: 30,
+            buildToolsVersion: "30.0.2",
+            minSdkVersion    : 15,
             targetSdkVersion : 28,
             versionCode      : 2,
             versionName      : "2.0.3"
     ]
 
-    dependencies = [
-            fragment    : 'com.android.support:support-fragment:28.0.0',
-            appCompat   : 'com.android.support:appcompat-v7:28.0.0',
-            design      : 'com.android.support:design:28.0.0',
-            recyclerview: 'com.android.support:recyclerview-v7:28.0.0',
-            flexbox     : 'com.google.android:flexbox:1.0.0',
-            constraint  : 'com.android.support.constraint:constraint-layout:1.1.0'
-
-    ]
-
-    bintray = [
-            dcendents     : 'com.github.dcendents.android-maven',
-            bintray       : 'com.jfrog.bintray',
-
-            version       : android.versionName,
-            version_kt    : "1.0.0",
-
-            group         : "com.banzhi.permission", // Maven Group ID for the artifact，一般填你唯一的包名
-
-            siteUrl       : 'https://github.com/jiang-banzhi/permission',   // 项目的主页
-            gitUrl        : 'https://github.com/jiang-banzhi/permission.git',   // Git仓库的url
-
-            //developer
-            developerId   : 'jiangyang',      //填写的一些基本信息
-            developerName : 'banzhi',
-            developerEmail: 'jy494495991@gmail.com',
-
-            //bintray- pkg
-            bintrayRepo   : "maven",
-            bintrayName   : 'permission',
-            bintrayName_kt: 'permission_kt',
-    ]
 }
