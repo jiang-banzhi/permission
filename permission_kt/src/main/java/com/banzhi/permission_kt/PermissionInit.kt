@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import androidx.fragment.app.FragmentActivity
 import java.lang.reflect.InvocationTargetException
 
 /**
@@ -71,6 +72,7 @@ class PermissionInit {
         }
 
         fun getTopActivity(): Activity? {
+
             return lifecycle.getTopActivity()
         }
     }

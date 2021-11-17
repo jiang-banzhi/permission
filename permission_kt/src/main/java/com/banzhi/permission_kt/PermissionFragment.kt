@@ -1,30 +1,29 @@
 package com.banzhi.permission_kt
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
-import androidx.activity.ComponentActivity
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import java.util.*
+import androidx.fragment.app.Fragment
+import kotlin.collections.ArrayList
+
 
 /**
  *<pre>
- * @author : No.1
- * @time : 2019/8/7.
+ * @author : jiang
+ * @time : 2021/11/17.
  * @desciption :
  * @version :
  *</pre>
  */
-class PermissionActivity : ComponentActivity() {
+class PermissionFragment : Fragment() {
     private val allSpecialPermissions = listOf(
         Manifest.permission.ACCESS_BACKGROUND_LOCATION,
         Manifest.permission.SYSTEM_ALERT_WINDOW,
@@ -32,72 +31,21 @@ class PermissionActivity : ComponentActivity() {
         Manifest.permission.MANAGE_EXTERNAL_STORAGE,
         Manifest.permission.REQUEST_INSTALL_PACKAGES
     )
-    val CODE_REQUEST_PERMISSION = 663
-    val CODE_REQUEST_INSTALL = 213
-    val CODE_REQUEST_OVERLAY = 214
 
+    private var sPermissionListener: PermissionListener? = null
 
-    var isRequestInstall = false//是否已经请求安装权限
-    var isRequestOverlay = false//是否已经请求悬浮窗权限
-
-    companion object {
-
-        const val PERMISSION_TAG = "permissions_kt"
-        private var sPermissionListener: PermissionListener? = null
-
-        /**
-         * 请求权限
-         *
-         * @param context
-         * @param permissions
-         * @param permissionListener
-         */
-        fun request(
-            context: Context,
-            permissions: Array<String>,
-            permissionListener: PermissionListener
-        ) {
-            sPermissionListener = permissionListener
-            val intent = Intent(context, PermissionActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.putExtra(PERMISSION_TAG, permissions)
-            context.startActivity(intent)
-        }
-
-        fun request(
-            context: Context,
-            permissions: List<String>,
-            permissionListener: PermissionListener
-        ) {
-            request(context, permissions.toTypedArray(), permissionListener)
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        invasionStatusBar()
-        requestPermissionNow()
-    }
-
-    private fun invasionStatusBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val window = window
-            val decorView = window.decorView
-            decorView.systemUiVisibility = (decorView.systemUiVisibility
-                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.statusBarColor = Color.TRANSPARENT
-        }
-    }
 
     private val normalList = mutableListOf<String>()
     private val specialList = mutableListOf<String>()
 
     //未授权集合
     private val deniedList = ArrayList<String>()
-    private fun requestPermissionNow() {
-        val requestList = intent.getStringArrayExtra(PERMISSION_TAG)
+
+    fun requestPermissionNow(
+        requestList: List<String>?,
+        permissionListener: PermissionListener
+    ) {
+        sPermissionListener = permissionListener
         requestList?.forEach {
             if (it in allSpecialPermissions) {
                 specialList.add(it)
@@ -106,8 +54,29 @@ class PermissionActivity : ComponentActivity() {
             }
         }
         val osVersion = Build.VERSION.SDK_INT
-        val targetSdkVersion = applicationInfo.targetSdkVersion
+        val targetSdkVersion = requireActivity().applicationInfo.targetSdkVersion
+        if (osVersion == Build.VERSION_CODES.Q ||
+            (osVersion == Build.VERSION_CODES.R && targetSdkVersion < Build.VERSION_CODES.R)
+        ) {
+            specialList.remove(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            normalList.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+        requestNormalPermissions()
+    }
 
+    private fun requestPermissionNow() {
+        val requestList = arguments?.let {
+            it.getStringArray("PERMISSION_TAG")
+        }
+        requestList?.forEach {
+            if (it in allSpecialPermissions) {
+                specialList.add(it)
+            } else {
+                normalList.add(it)
+            }
+        }
+        val osVersion = Build.VERSION.SDK_INT
+        val targetSdkVersion = requireActivity().applicationInfo.targetSdkVersion
         if (osVersion == Build.VERSION_CODES.Q ||
             (osVersion == Build.VERSION_CODES.R && targetSdkVersion < Build.VERSION_CODES.R)
         ) {
@@ -120,8 +89,10 @@ class PermissionActivity : ComponentActivity() {
     private fun requestPermissions() {
         if (specialList.isNotEmpty()) {
             val permission = specialList.firstOrNull()
-            val message = packageManager.getApplicationLabel(applicationInfo).toString()
-            DefaultDialog(this, permission, message) {
+            val message =
+                requireActivity().packageManager.getApplicationLabel(requireActivity().applicationInfo)
+                    .toString()
+            DefaultDialog(requireActivity(), permission, message) {
                 when (it) {
                     0 -> {
                         requestSpecialPermissions(permission)
@@ -137,7 +108,15 @@ class PermissionActivity : ComponentActivity() {
         }
         sPermissionListener?.onPermissionListerer(deniedList)
         sPermissionListener = null
-        finish()
+        detachActivity()
+    }
+
+    /**
+     * 解绑 Activity
+     */
+    private fun detachActivity() {
+        requireActivity().supportFragmentManager.beginTransaction().remove(this)
+            .commitAllowingStateLoss()
     }
 
     private fun requestSpecialPermissions(permission: String?) {
@@ -192,14 +171,14 @@ class PermissionActivity : ComponentActivity() {
     private fun requestInstallPermission() {
         if (specialList.contains(Manifest.permission.REQUEST_INSTALL_PACKAGES)
             && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-            && applicationInfo.targetSdkVersion >= Build.VERSION_CODES.O
+            && requireActivity().applicationInfo.targetSdkVersion >= Build.VERSION_CODES.O
         ) {
-            if (packageManager.canRequestPackageInstalls()) {
+            if (requireActivity().packageManager.canRequestPackageInstalls()) {
                 onRequestInstallPackagesPermissionResult()
                 return
             }
             val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
-            intent.data = Uri.parse("package:${packageName}")
+            intent.data = Uri.parse("package:${requireActivity().packageName}")
             installPackagesLauncher.launch(intent)
         } else {
             onRequestInstallPackagesPermissionResult()
@@ -210,7 +189,7 @@ class PermissionActivity : ComponentActivity() {
 
     private fun onRequestInstallPackagesPermissionResult() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!packageManager.canRequestPackageInstalls()) {
+            if (!requireActivity().packageManager.canRequestPackageInstalls()) {
                 deniedList.add(Manifest.permission.REQUEST_INSTALL_PACKAGES)
             }
         }
@@ -229,14 +208,14 @@ class PermissionActivity : ComponentActivity() {
     private fun requestSystemAlertPermission() {
         if (specialList.contains(Manifest.permission.SYSTEM_ALERT_WINDOW)
             && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            && applicationInfo.targetSdkVersion >= Build.VERSION_CODES.O
+            && requireActivity().applicationInfo.targetSdkVersion >= Build.VERSION_CODES.O
         ) {
-            if (Settings.canDrawOverlays(this)) {
+            if (Settings.canDrawOverlays(requireActivity())) {
                 onRequestSystemAlertWindowPermissionResult()
                 return
             }
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-            intent.data = Uri.parse("package:${packageName}")
+            intent.data = Uri.parse("package:${requireActivity().packageName}")
             requestSystemAlertWindowLauncher.launch(intent)
         } else {
             onRequestSystemAlertWindowPermissionResult()
@@ -245,7 +224,7 @@ class PermissionActivity : ComponentActivity() {
 
     private fun onRequestSystemAlertWindowPermissionResult() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) {
+            if (!Settings.canDrawOverlays(requireActivity())) {
                 deniedList.add(Manifest.permission.SYSTEM_ALERT_WINDOW)
             }
         }
@@ -265,10 +244,10 @@ class PermissionActivity : ComponentActivity() {
     private fun requestWriteSettingPermission() {
         if (specialList.contains(Manifest.permission.WRITE_SETTINGS)
             && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            && !Settings.System.canWrite(this)
+            && !Settings.System.canWrite(requireActivity())
         ) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-            intent.data = Uri.parse("package:${packageName}")
+            intent.data = Uri.parse("package:${requireActivity().packageName}")
             writeSettingsLauncher.launch(intent)
         } else {
             onRequestWriteSettingsPermissionResult()
@@ -278,7 +257,7 @@ class PermissionActivity : ComponentActivity() {
     private fun onRequestWriteSettingsPermissionResult() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
         ) {
-            if (!Settings.System.canWrite(this)) {
+            if (!Settings.System.canWrite(requireActivity())) {
                 deniedList.add(Manifest.permission.WRITE_SETTINGS)
             }
         }

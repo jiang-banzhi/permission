@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 
 /**
  *<pre>
@@ -50,10 +51,25 @@ class AndPermisstion : PermissionListener {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PermissionActivity.request(topActivity, permissions, this)
+            if (topActivity is AppCompatActivity) {
+                val existedFragment =
+                    topActivity.supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
+                if (existedFragment != null) {
+                    existedFragment as PermissionFragment
+                } else {
+                    val invisibleFragment = PermissionFragment()
+                    topActivity.supportFragmentManager.beginTransaction()
+                        .add(invisibleFragment, FRAGMENT_TAG)
+                        .commitNowAllowingStateLoss()
+                    invisibleFragment
+                }
+                    .requestPermissionNow(permissions, this)
+            }
         }
+
     }
 
+    private val FRAGMENT_TAG = "InvisibleFragment"
     private fun createDialog(context: Context): Dialog {
         return AlertDialog.Builder(context).setTitle("提示信息").setMessage(
             "当前应用缺少必要" +
