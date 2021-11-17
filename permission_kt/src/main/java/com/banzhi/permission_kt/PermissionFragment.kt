@@ -48,37 +48,18 @@ class PermissionFragment : Fragment() {
         sPermissionListener = permissionListener
         requestList?.forEach {
             if (it in allSpecialPermissions) {
-                specialList.add(it)
+                if (!checkSpecialPermission(it)) {
+                    specialList.add(it)
+                }
             } else {
                 normalList.add(it)
             }
         }
         val osVersion = Build.VERSION.SDK_INT
         val targetSdkVersion = requireActivity().applicationInfo.targetSdkVersion
-        if (osVersion == Build.VERSION_CODES.Q ||
-            (osVersion == Build.VERSION_CODES.R && targetSdkVersion < Build.VERSION_CODES.R)
-        ) {
-            specialList.remove(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-            normalList.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        }
-        requestNormalPermissions()
-    }
-
-    private fun requestPermissionNow() {
-        val requestList = arguments?.let {
-            it.getStringArray("PERMISSION_TAG")
-        }
-        requestList?.forEach {
-            if (it in allSpecialPermissions) {
-                specialList.add(it)
-            } else {
-                normalList.add(it)
-            }
-        }
-        val osVersion = Build.VERSION.SDK_INT
-        val targetSdkVersion = requireActivity().applicationInfo.targetSdkVersion
-        if (osVersion == Build.VERSION_CODES.Q ||
-            (osVersion == Build.VERSION_CODES.R && targetSdkVersion < Build.VERSION_CODES.R)
+        if (requestList?.contains(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == true &&
+            (osVersion == Build.VERSION_CODES.Q ||
+                    (osVersion == Build.VERSION_CODES.R && targetSdkVersion < Build.VERSION_CODES.R))
         ) {
             specialList.remove(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
             normalList.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
@@ -128,7 +109,7 @@ class PermissionFragment : Fragment() {
                 requestInstallPermission()
             }
             Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
-                requestInstallPermission()
+                requestBackgroundLocationLauncher()
             }
             Manifest.permission.WRITE_SETTINGS -> {
                 requestWriteSettingPermission()
@@ -322,4 +303,35 @@ class PermissionFragment : Fragment() {
         requestPermissions()
     }
 
+    /**
+     * 是否已经授予特殊权限
+     */
+    private fun checkSpecialPermission(permission: String?): Boolean {
+        return when (permission) {
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                PermissionChecker.hasPermission(requireContext(), permission)
+            }
+            Manifest.permission.SYSTEM_ALERT_WINDOW -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    Settings.canDrawOverlays(requireActivity()) else true
+
+            }
+            Manifest.permission.WRITE_SETTINGS -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Settings.System.canWrite(requireActivity())
+                } else {
+                    true
+                }
+            }
+            Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager() else true
+
+            }
+            Manifest.permission.REQUEST_INSTALL_PACKAGES -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    requireActivity().packageManager.canRequestPackageInstalls() else true
+            }
+            else -> false
+        }
+    }
 }
