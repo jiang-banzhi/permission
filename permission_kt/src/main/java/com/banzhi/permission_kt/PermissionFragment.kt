@@ -4,15 +4,10 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import kotlin.collections.ArrayList
 
 
 /**
@@ -64,8 +59,10 @@ class PermissionFragment : Fragment() {
             specialList.remove(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
             normalList.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         }
+
         requestNormalPermissions()
     }
+
 
     private fun requestPermissions() {
         if (specialList.isNotEmpty()) {
@@ -83,6 +80,7 @@ class PermissionFragment : Fragment() {
                         requestSpecialPermissions(permission)
                     }
                 }
+
             }.show()
 
             return

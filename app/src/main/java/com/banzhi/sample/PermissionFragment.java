@@ -55,6 +55,7 @@ public class PermissionFragment extends Fragment {
         AndPermisstion.Companion.getInstance()
                 .newBuilder()
                 .permissions(Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_FINE_LOCATION)
+                .setShowTip(true)
                 .request(new PermissionCallback() {
                     @Override
                     public void onGranted() {

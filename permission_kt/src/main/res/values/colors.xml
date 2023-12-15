@@ -4,4 +4,5 @@
     <color name="permission_split_line">#e0e0e0</color>
     <color name="permission_tint_color">#1972e8</color>
     <color name="permission_text_color">#212121</color>
+    <color name="permission_purpose_dialog_bg">#e0e0e0</color>
 </resources>

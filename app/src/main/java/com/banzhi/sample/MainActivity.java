@@ -35,7 +35,12 @@ public class MainActivity extends AppCompatActivity {
                 getApplicationByReflect();
                 AndPermisstion.Companion.getInstance()
                         .newBuilder()
-                        .permissions(Manifest.permission.REQUEST_INSTALL_PACKAGES,Manifest.permission.CAMERA,Manifest.permission.SYSTEM_ALERT_WINDOW)
+                        .setPurposeOfUse("sdjlfksjdlkjfsldkjfkls")
+                        .permissions(
+//                                Manifest.permission.REQUEST_INSTALL_PACKAGES,
+                                Manifest.permission.CAMERA
+//                                Manifest.permission.SYSTEM_ALERT_WINDOW
+                        )
                         .request(new PermissionCallback() {
                             @Override
                             public void onGranted() {

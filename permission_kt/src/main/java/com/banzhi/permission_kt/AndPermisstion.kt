@@ -21,6 +21,7 @@ class AndPermisstion : PermissionListener {
     private var permissionCallback: PermissionCallback? = null
     private var mSetting: SettingServer? = null
     private var tipDialog: Dialog? = null
+    private var purposeView: IPurposeView? = null
 
 
     companion object {
@@ -49,8 +50,16 @@ class AndPermisstion : PermissionListener {
             }
             tipDialog = createDialog(topActivity)
         }
+        if (builder.purposeOfUse != null) {
+            purposeView = builder.purposeOfUse
+        } else {
+            if (!builder.purposeText.isNullOrEmpty()) {
+                purposeView = PermissionPurposeOfUseTipView(topActivity, builder.purposeText!!)
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            purposeView?.show()
             if (topActivity is AppCompatActivity) {
                 val existedFragment =
                     topActivity.supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
@@ -74,7 +83,9 @@ class AndPermisstion : PermissionListener {
         return AlertDialog.Builder(context).setTitle("提示信息").setMessage(
             "当前应用缺少必要" +
                     "权限，该功能暂时无法使用。如若需要，请单击【确定】按钮前往设置中心进行权限授权。"
-        )
+        ).setOnDismissListener {
+            purposeView?.dismiss()
+        }
             .setNegativeButton("取消") { _, _ -> mSetting?.cancle() }
             .setPositiveButton("确定") { _, _ -> mSetting?.execute() }.create()
     }
@@ -101,6 +112,8 @@ class AndPermisstion : PermissionListener {
         var permissionCallback: PermissionCallback? = null
         var mSetting: SettingServer? = null
         var tipDialog: Dialog? = null
+        var purposeText: String? = null
+        var purposeOfUse: IPurposeView? = null
         internal var showTip = true
 
         /**
@@ -145,6 +158,16 @@ class AndPermisstion : PermissionListener {
          */
         fun setShowTip(showTip: Boolean): Builder {
             this.showTip = showTip
+            return this
+        }
+
+        fun setPurposeOfUse(text: String): Builder {
+            this.purposeText = text
+            return this
+        }
+
+        fun setPurposeOfUse(purposeView: IPurposeView): Builder {
+            this.purposeOfUse = purposeView
             return this
         }
 
