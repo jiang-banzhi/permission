@@ -95,6 +95,7 @@ class AndPermisstion : PermissionListener {
     }
 
     override fun onPermissionListerer(permissions: List<String>) {
+        purposeView?.dismiss()
         if (permissions.isEmpty()) {
             //全部都授予了权限
             permissionCallback?.onGranted()

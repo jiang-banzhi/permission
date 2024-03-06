@@ -2,6 +2,7 @@ package com.banzhi.permission_kt
 
 import android.app.AlertDialog
 import android.content.Context
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.WindowManager
